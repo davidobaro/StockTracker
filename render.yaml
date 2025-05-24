@@ -3,9 +3,11 @@ services:
     name: stocktracker-backend
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn wsgi:app
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
     envVars:
       - key: FINNHUB_API_KEY
         sync: false
+      - key: PORT
+        value: 10000
     plan: free
     healthCheckPath: /api/health
