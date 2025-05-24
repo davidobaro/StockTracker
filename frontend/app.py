@@ -355,7 +355,7 @@ def create_price_range_chart(quote_data):
     return fig
 
 # Main content
-st.title("Stock Portfolio Predictor")
+st.title("Stock Portfolio Tracker")
 
 if not st.session_state.portfolio:
     st.info("Add stocks to your portfolio using the sidebar")
