@@ -7,8 +7,8 @@ import requests
 from datetime import datetime
 import time
 
-# Backend API URL
-BACKEND_URL = "http://localhost:5001"
+# Backend API URL from Streamlit secrets or default to localhost
+BACKEND_URL = st.secrets.get("BACKEND_URL", "https://stocktracker-backend-9n1j.onrender.com")
 
 def get_api_url(endpoint):
     """Helper function to build API URLs"""
@@ -24,7 +24,7 @@ def check_backend_health():
 
 # Check backend health
 if not check_backend_health():
-    st.error("⚠️ Could not connect to the backend server. Please make sure it's running on http://localhost:5000")
+    st.error(f"⚠️ Could not connect to the backend server at {BACKEND_URL}")
     st.stop()
 
 # Popular stocks with their symbols and categories
