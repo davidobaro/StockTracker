@@ -8,7 +8,6 @@ A modern stock portfolio management and prediction application that combines rea
 - Real-time stock quotes
 - Historical price charts
 - Company profiles
-- Price predictions using LSTM
 
 ## Setup
 
@@ -68,17 +67,16 @@ stock-predictor/
 └── README.md
 ```
 
-## Tech Stack 🛠️
+## Tech Stack️
 
 - **Backend**: Flask with Flask-CORS
 - **Frontend**: Streamlit
 - **Data Sources**: Finnhub API, Yahoo Finance
-- **Machine Learning**: TensorFlow (LSTM model)
 - **Data Processing**: Pandas, NumPy
 - **Visualization**: Plotly
 - **Development**: Python 3.12+
 
-## Contributing 🤝
+## Contributing
 
 Contributions are welcome! Here's how you can help:
 
