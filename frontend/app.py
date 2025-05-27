@@ -116,7 +116,42 @@ def create_intraday_chart(ticker):
         )
         
         if response.status_code == 200:
-            data = response.json()['data']  # Access the 'data' key from the enhanced backend response
+            response_data = response.json()
+            data = response_data['data']  # Access the 'data' key from the enhanced backend response
+            
+            # Check if we're showing data from a different date than today
+            if data['timestamp']:
+                last_data_date = pd.to_datetime(data['timestamp'][-1]).date()
+                today = datetime.now().date()
+                current_time = datetime.now().time()
+                
+                if last_data_date < today:
+                    # Show an info message about the data being from the last trading day
+                    days_diff = (today - last_data_date).days
+                    day_name = last_data_date.strftime('%A')
+                    
+                    if days_diff == 1:
+                        st.info(f"📅 Showing data from last trading day - {day_name}, {last_data_date.strftime('%B %d, %Y')}")
+                    elif days_diff <= 3:
+                        st.info(f"📅 Showing data from {days_diff} days ago - {day_name}, {last_data_date.strftime('%B %d, %Y')} (last available trading day)")
+                    else:
+                        st.info(f"📅 Showing data from {day_name}, {last_data_date.strftime('%B %d, %Y')} (last available trading day)")
+                        
+                    # Add additional context about why data might be from a previous day
+                    if today.weekday() in [5, 6]:  # Saturday or Sunday
+                        st.caption("💡 Markets are closed on weekends. Data shows the last trading day (Friday).")
+                    elif today.weekday() == 0 and days_diff == 3:  # Monday and 3 days ago (Friday)
+                        st.caption("💡 Markets were closed over the weekend. Data shows Friday's trading session.")
+                    elif current_time.hour < 9 or (current_time.hour == 9 and current_time.minute < 30):
+                        st.caption("💡 Markets haven't opened yet today (9:30 AM ET). Data shows the previous trading day.")
+                elif last_data_date == today:
+                    # Show current day info
+                    if current_time.hour >= 16:  # After 4 PM ET
+                        st.info(f"📅 Showing today's data - {today.strftime('%A, %B %d, %Y')} (markets closed)")
+                    elif current_time.hour >= 9 and (current_time.hour > 9 or current_time.minute >= 30):
+                        st.info(f"📅 Showing today's live data - {today.strftime('%A, %B %d, %Y')} (markets open)")
+                    else:
+                        st.info(f"📅 Showing today's pre-market data - {today.strftime('%A, %B %d, %Y')}")
             
             # Create line chart
             fig = go.Figure()
@@ -354,6 +389,23 @@ def create_price_range_chart(quote_data):
     
     return fig
 
+# Function to fetch prediction
+def fetch_prediction(ticker):
+    try:
+        url = get_api_url(f"stock/predict/{ticker}")
+        response = requests.get(url, timeout=30)
+        
+        if response.status_code == 200:
+            result = response.json()
+            return result
+        else:
+            error_msg = response.json().get('error', 'Unknown error') if response.content else f"HTTP {response.status_code}"
+            return {'error': error_msg}
+    except requests.exceptions.RequestException as e:
+        return {'error': f'Connection error: {str(e)}'}
+    except Exception as e:
+        return {'error': str(e)}
+
 # Main content
 st.title("Stock Portfolio Tracker")
 
@@ -409,6 +461,15 @@ else:
                             
                             # Display previous close
                             st.write(f"**Previous Close:** ${prev_close:.2f}")
+                            
+                            # Add prediction button and result
+                            if st.button(f"Predict Next Close for {ticker}", key=f"predict_{ticker}"):
+                                with st.spinner("Calculating prediction..."):
+                                    prediction = fetch_prediction(ticker)
+                                if prediction.get('error'):
+                                    st.error(f"Prediction error: {prediction['error']}")
+                                else:
+                                    st.success(f"Predicted close for {prediction['date']}: ${prediction['predicted_close']:.2f}")
                             
                             # Add intraday chart
                             fig = create_intraday_chart(ticker)
