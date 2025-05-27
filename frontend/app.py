@@ -465,8 +465,8 @@ else:
                             # Add prediction warning and button
                             st.warning("⚠️ Price predictions are temporarily unavailable due to server memory constraints.")
                             
-                            # Add prediction button and result
-                            if st.button(f"Predict Next Close for {ticker}", key=f"predict_{ticker}"):
+                            # Add prediction button (disabled) and result
+                            if st.button(f"Predict Next Close for {ticker}", key=f"predict_{ticker}", disabled=True):
                                 with st.spinner("Calculating prediction..."):
                                     prediction = fetch_prediction(ticker)
                                 if prediction.get('error'):
