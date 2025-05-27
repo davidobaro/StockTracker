@@ -462,6 +462,9 @@ else:
                             # Display previous close
                             st.write(f"**Previous Close:** ${prev_close:.2f}")
                             
+                            # Add prediction warning and button
+                            st.warning("⚠️ Price predictions are temporarily unavailable due to server memory constraints.")
+                            
                             # Add prediction button and result
                             if st.button(f"Predict Next Close for {ticker}", key=f"predict_{ticker}"):
                                 with st.spinner("Calculating prediction..."):

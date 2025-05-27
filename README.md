@@ -1,13 +1,30 @@
-# Stock Portfolio Predictor 📈
+# Stock Portfolio Predictor
 
 A modern stock portfolio management and prediction application that combines real-time market data with machine learning predictions. Built with a Flask backend, Streamlit frontend, and powered by Finnhub API.
 
-## Features ✨
+## Features
 
-- Portfolio management (add/remove stocks)
-- Real-time stock quotes
-- Historical price charts
-- Company profiles
+- **Portfolio Management**: Add/remove stocks with popular stock categories
+- **Real-time Stock Quotes**: Live price data with company profiles and logos
+- **Interactive Charts**: Intraday price charts with multiple timeframes (1D-1Y)
+- **Technical Analysis**: Moving averages (9-day and 20-day) and volume indicators
+- **Smart Date Display**: Automatic detection of trading days vs. weekends/holidays
+- **Price Predictions**: LSTM neural network model for next-day price forecasting
+- **Company Profiles**: Industry information and company logos
+- **Market Context**: Real-time market status and trading hours awareness
+
+## Machine Learning Features
+
+### LSTM Price Prediction Model
+
+- **Architecture**: Long Short-Term Memory (LSTM) neural network
+- **Training Data**: 5 years of historical daily price data
+- **Sequence Length**: 60-day lookback window for pattern recognition
+- **Features**: Multi-layer LSTM with dropout regularization
+- **Output**: Next trading day closing price prediction
+- **Data Sources**: Hybrid approach using Finnhub and Yahoo Finance APIs
+
+**Note**: Price predictions are currently unavailable due to server memory constraints.
 
 ## Setup
 
@@ -67,14 +84,58 @@ stock-predictor/
 └── README.md
 ```
 
-## Tech Stack️
+## Tech Stack 🛠️
 
 - **Backend**: Flask with Flask-CORS
-- **Frontend**: Streamlit
-- **Data Sources**: Finnhub API, Yahoo Finance
-- **Data Processing**: Pandas, NumPy
-- **Visualization**: Plotly
+- **Frontend**: Streamlit with interactive charts
+- **Data Sources**: Finnhub API, Yahoo Finance (hybrid fallback system)
+- **Machine Learning**: TensorFlow/Keras (LSTM neural networks)
+- **Data Processing**: Pandas, NumPy, Scikit-learn
+- **Visualization**: Plotly (interactive charts with technical indicators)
+- **Deployment**: Render (backend), Streamlit Cloud (frontend)
 - **Development**: Python 3.12+
+
+## API Architecture 🏗️
+
+### Hybrid Data Fetching
+
+- **Primary**: Finnhub API for daily/weekly/monthly data
+- **Fallback**: Yahoo Finance for intraday data and when Finnhub fails
+- **Auto-Extension**: Automatically extends time periods when no current data available
+- **Market-Aware**: Handles weekends, holidays, and pre/post-market hours
+
+### Endpoints
+
+- `/api/health` - Health check
+- `/api/stock/profile/<ticker>` - Company profile and logo
+- `/api/stock/quote/<ticker>` - Real-time quote data
+- `/api/stock/intraday/<ticker>` - Historical price data with flexible intervals
+- `/api/stock/predict/<ticker>` - LSTM price prediction (memory-intensive)
+
+## Deployment & Memory Optimization
+
+### Current Status
+
+- **Frontend**: Deployed on Streamlit Cloud
+- **Backend**: Render (free tier with 512MB memory limit)
+- **Issue**: LSTM model requires >512MB RAM, causing memory constraints
+
+### Alternative Deployment Options
+
+For the machine learning features to work properly, consider these platforms with higher memory limits:
+
+1. **Railway** (8GB hobby plan, 1GB free tier)
+2. **Fly.io** (256MB-8GB configurable)
+3. **Google Cloud Run** (up to 8GB, serverless)
+4. **DigitalOcean App Platform** (512MB-8GB)
+5. **Heroku** (512MB-2.5GB with paid plans)
+
+### Memory Optimization Strategies
+
+- Reduced LSTM model size (25 units vs 50 units per layer)
+- TensorFlow memory growth optimization
+- Smaller sequence length (30 vs 60 days)
+- Lazy model loading (only when prediction requested)
 
 ## Contributing
 
